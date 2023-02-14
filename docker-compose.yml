@@ -1,0 +1,34 @@
+version: "3.7"
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: planka_bridge-nginx
+    restart: always
+    ports:
+      - "89:80"
+    volumes:
+      - ./src:/var/www
+      - ./docker/nginx:/etc/nginx/conf.d/
+    networks:
+      - planka_bridge
+
+  app:
+    build:
+      args:
+        USER: decole
+        UID: 1000
+      context: ./
+      dockerfile: ./docker/php/Dockerfile
+    image: planka_bridge
+    container_name: planka_bridge-app
+    restart: always
+    volumes:
+      - ./src:/var/www
+      - ./docker-compose/php/php-fpm.ini:/usr/local/etc/php/conf.d/php-fpm.ini
+    networks:
+      - planka_bridge
+
+networks:
+  planka_bridge:
+    driver: bridge
